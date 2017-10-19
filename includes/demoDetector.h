@@ -457,7 +457,7 @@ TDetector demoDetector<TVocabulary, TDetector, TDescriptor>::runPreSession
   std::cout<<n<<std::endl; 
 
   vector<string> filenames = 
-  DUtils::FileFunctions::Dir(n.c_str(), ".jpg", true);
+  DUtils::FileFunctions::Dir(n.c_str(), ".png", true);
   cout << "I am here!" << endl;
   cout << filenames[0].c_str() << endl;
   
@@ -623,7 +623,7 @@ void demoDetector<TVocabulary, TDetector, TDescriptor>::runSession
   //std::string &name = n; 
 
   vector<string> filenames = 
-  DUtils::FileFunctions::Dir(n.c_str(), ".jpg", true);
+  DUtils::FileFunctions::Dir(n.c_str(), ".png", true);
   cout << "I am here!" << endl;
   cout << filenames[0].c_str() << endl;
   // we can allocate memory for the expected number of images

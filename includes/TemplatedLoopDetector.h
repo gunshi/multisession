@@ -550,7 +550,7 @@ TemplatedLoopDetector<TDescriptor,F>::Parameters::Parameters
 template <class TDescriptor, class F> 
 void TemplatedLoopDetector<TDescriptor,F>::Parameters::set(float f)
 {
-  dislocal = 500 * f;
+  dislocal = 50 * f;
   max_db_results = 50 * f;
   min_nss_factor = 0.005;
   min_matches_per_group = f;

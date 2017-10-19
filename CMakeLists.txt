@@ -272,6 +272,7 @@ set (INCLUDE_DIR includes)
 # use sse3 instruction set
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse3")
 
+find_package( OpenCV REQUIRED )
 # include directory
 include_directories(${INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${CSPARSE_INCLUDE_DIR})
 MESSAGE(STATUS "printing opencv dirs")
@@ -290,10 +291,18 @@ find_package( Threads REQUIRED )
 SET_TARGET_PROPERTIES(main PROPERTIES OUTPUT_NAME main${EXE_POSTFIX})
 
 
+find_library(OPENGL_LIBRARY GL)
+find_library(GLU_LIBRARY GLU)
+set(OPENGL_LIBRARY ${OPENGL_LIBRARY} ${GLU_LIBRARY})
+find_library(GLUT_LIBRARY glut)
+include_directories(/usr/local/include/AprilTags/)
+
+
+
 ##which of the two?
 find_library(GTSAM_LIBRARY gtsam HINTS /usr/local/lib)
 MESSAGE(STATUS ${GTSAM_LIBRARY})
-target_link_libraries(main ${GTSAM_LIBRARY})
+target_link_libraries(main ${GTSAM_LIBRARY} /usr/lib/libtbb.so)
 
 find_library(BOOST_SYSTEM_LIBRARY boost_system HINTS /usr/lib/x86_64-linux-gnu)
 MESSAGE(STATUS ${BOOST_SYSTEM_LIBRARY})
@@ -302,5 +311,10 @@ target_link_libraries(main ${BOOST_SYSTEM_LIBRARY})
 TARGET_LINK_LIBRARIES(main core solver_csparse)
 TARGET_LINK_LIBRARIES(main types_slam2d)
 TARGET_LINK_LIBRARIES(main types_slam3d)
-target_link_libraries( main ${OpenCV_LIBS} ${DLib_LIBS} ${DBoW2_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+TARGET_LINK_LIBRARIES(main /usr/local/lib/libapriltags.a)
+target_link_libraries( main ${OpenCV_LIBS} ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${DLib_LIBS} ${DBoW2_LIBS} ${CMAKE_THREAD_LIBS_INIT} )
+
+
+
+
 

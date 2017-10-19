@@ -34,10 +34,13 @@ using namespace cv;
 #define PI 3.14159265
 
 // Directory of Images
-string IMG_DIR = "/home/gunshi/Downloads/oct11_dusshera/loop3/";
-static const string image_dir_firstloop="/home/gunshi/Downloads/oct11_dusshera/loop1/";
+string IMG_DIR = "/media/Heavy_dataset/CAIR_final_dataset/exp3_images/";
+//string IMG_DIR = "/home/tushar/dataset/CAIR_review_4/dataset_cair_final/exp_12_10_2_sync_imgs/";
+
+static const string image_dir_firstloop="/media/Heavy_dataset/CAIR_final_dataset/exp4_images/";
+//static const string image_dir_firstloop="/home/tushar/dataset/CAIR_review_4/dataset_cair_final/exp12101-new/exp_12_10_1_sync_images/";
 // DLoop resources
-static const string VOC_FILE = "./resources/huskymerge_voc.voc.gz";
+static const string VOC_FILE = "./resources/iiit2_voc.voc.gz";
 //static const string IMAGE_DIR = IMG_DIR1 + "left/";
 static const int IMAGE_W = 640; // image size
 static const int IMAGE_H = 480;
@@ -113,11 +116,11 @@ int main()
 {
     gtsam::ISAM2Params params;
     params.optimizationParams = gtsam::ISAM2DoglegParams();
-    params.relinearizeSkip = 10;
+    params.relinearizeSkip = 1;
     params.enablePartialRelinearizationCheck = true;
     gtsam::ISAM2 isam2(params);
     gtsam::NonlinearFactorGraph nfg;
-    string g2ofilename = "3doptimisedloop1.g2o";
+    string g2ofilename = "3doptimisedloopexp4.g2o";
     std::pair<gtsam::NonlinearFactorGraph::shared_ptr, gtsam::Values::shared_ptr> data = gtsam::load3D(g2ofilename);
     //initial=*(data.second);
     //initial.print();

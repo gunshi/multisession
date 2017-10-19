@@ -218,17 +218,18 @@ void insertIntoIsam(gtsam::ISAM2 &isam2,gtsam::NonlinearFactorGraph &nfg, int id
                 newFactors.push_back(observation);
 
 
-                if(observation->key1() <  observation->key2()){ 
+                if(observation->key1()+1 ==  observation->key2()){
                   //normal odometric measurement  or +5 frame closure
                   cout<<" observation->key1() < observation->key2()"<<endl;
                   if(!isam2.valueExists(observation->key2()) ){                     
                     if(!isam2.valueExists(observation->key1())){
                         throw runtime_error("Problem! None exist");
                     }
-                      cout<<" inserting key2"<<endl;
-                      gtsam::Pose3 previousPose = isam2.calculateEstimate<gtsam::Pose3>(observation->key1());
-                      newVariables.insert(observation->key2(), previousPose * observation->measured());
+
 			if(observation->key1() +1== observation->key2()){
+                            cout<<" inserting key2"<<endl;
+                            gtsam::Pose3 previousPose = isam2.calculateEstimate<gtsam::Pose3>(observation->key1());
+                            newVariables.insert(observation->key2(), previousPose * observation->measured());
 
 				std::cout<<"BOTH PRINTS FOR COMPARE"<<std::endl;
 				std::cout<<"updating for key2 "<<observation->key2()<<std::endl;
@@ -247,6 +248,7 @@ void insertIntoIsam(gtsam::ISAM2 &isam2,gtsam::NonlinearFactorGraph &nfg, int id
                   }
                 }
                 else {  //loop closure case
+                    /**
                   cout<<" observation->key1() > observation->key2()"<<endl;
                   if(!isam2.valueExists(observation->key1()) ){
                     if(!isam2.valueExists(observation->key2())){
@@ -257,7 +259,9 @@ void insertIntoIsam(gtsam::ISAM2 &isam2,gtsam::NonlinearFactorGraph &nfg, int id
                       gtsam::Pose3 previousPose = isam2.calculateEstimate<gtsam::Pose3>(observation->key2());
                       newVariables.insert(observation->key1(), previousPose * observation->measured().inverse());
                     }
-                  }
+                  }**/
+                                    loopFactors.push_back(factor);
+                                                    continue;
                 }
                       
         }
@@ -316,13 +320,31 @@ void my_libviso2(string dir, int numImg,gtsam::ISAM2 &isam2,gtsam::NonlinearFact
   // set most important visual odometry parameters
   // for a full parameter list, look at: viso_stereo.h
   VisualOdometryStereo::parameters param;
-  
+/**
+    param.calib.f  = 722.658813477; // focal length in pixels
+      param.calib.cu = 619.283325195; // principal point (u-coordinate) in pixels
+        param.calib.cv = 360.0; // principal point (v-coordinate) in pixels
+          param.base     = 0.12; // baseline in meters
+  **/
+
+/*      param.calib.f  =  699.11900; // focal length in pixels
+          param.calib.cu = 669.65700; // principal point (u-coordinate) in pixels
+                param.calib.cv = 360.60200; // principal point (v-coordinate) in pixels
+                     param.base     = 0.12; // baseline in meters
+  **/
+
+        param.calib.f = 567.65218; // focal length in pixels
+                param.calib.cu = 679.34969; // principal point (u-coordinate) in pixels
+                          param.calib.cv = 370.93921; // principal point (v-coordinate) in pixels
+                                   param.base     = 0.12; // baseline in meters
+
+  /**  
   // calibration parameters for sequence 2010_03_09_drive_0019 
   param.calib.f  = 711.9212646484375; // focal length in pixels
   param.calib.cu = 647.0408325195312; // principal point (u-coordinate) in pixels
   param.calib.cv = 360.7899169921875; // principal point (v-coordinate) in pixels
   param.base     = 0.12; // baseline in meters
-
+**/
   pthread_mutex_init(&myMutex,0);
   pthread_t g2othread;
   pthread_attr_t attr;
@@ -378,7 +400,7 @@ void my_libviso2(string dir, int numImg,gtsam::ISAM2 &isam2,gtsam::NonlinearFact
   pthread_mutex_unlock(&myMutex);
 
   // input file names
-  char base_name[256]; sprintf(base_name,"%04d.jpg",i);
+  char base_name[256]; sprintf(base_name,"%04d.png",i);
   string left_img_file_name  = dir + "left/" + base_name;
   string right_img_file_name = dir + "right/" + base_name;
   cout << "////////will start Processing: Frame: " << i << endl;
@@ -562,13 +584,31 @@ bool my_libviso2_relative(Matrix &Tr_final, int index1, int index2, std::string 
   else{
       dir_second=dir2;
   }
-  
-  // calibration parameters for sequence 2010_03_09_drive_0019 
+  /**
+    param.calib.f  = 722.658813477; // focal length in pixels
+    param.calib.cu = 619.283325195; // principal point (u-coordinate) in pixels
+    param.calib.cv = 360.0; // principal point (v-coordinate) in pixels
+    param.base     = 0.12; // baseline in meters
+**/
+  /**
+      param.calib.f  =  699.11900; // focal length in pixels
+          param.calib.cu = 669.65700; // principal point (u-coordinate) in pixels
+                param.calib.cv = 360.60200; // principal point (v-coordinate) in pixels
+                     param.base     = 0.12; // baseline in meters
+  **/
+
+          param.calib.f = 567.65218; // focal length in pixels
+                  param.calib.cu = 679.34969; // principal point (u-coordinate) in pixels
+                            param.calib.cv = 370.93921; // principal point (v-coordinate) in pixels
+                                     param.base     = 0.12; // baseline in meters
+
+  /**
+   * // calibration parameters for sequence 2010_03_09_drive_0019 
   param.calib.f  = 711.9212646484375; // focal length in pixels
   param.calib.cu = 647.0408325195312; // principal point (u-coordinate) in pixels
   param.calib.cv = 360.7899169921875; // principal point (v-coordinate) in pixels
   param.base     = 0.12; // baseline in meters
-
+**/
   
   // init visual odometry
   VisualOdometryStereo viso(param);
@@ -587,14 +627,27 @@ bool my_libviso2_relative(Matrix &Tr_final, int index1, int index2, std::string 
     {
       if (j==1)
       {
-        char base_name[256]; sprintf(base_name,"%04d.jpg",index1);
+          //if(dir2.empty()){
+            //  char base_name[256]; sprintf(base_name,"%04d.jpg",index1);
+        //  }
+         // else{
+            char base_name[256]; sprintf(base_name,"%04d.png",index1);
+          //}
+        
         left_img_file_name  = dir + "left/" + base_name;
         right_img_file_name = dir + "right/" + base_name;
        // r.frame1 = index1;
       }
       else
       {
-        char base_name[256]; sprintf(base_name,"%04d.jpg",index2);
+          char base_name[256];
+          if(true || dir==dir_second){
+             sprintf(base_name,"%04d.png",index2);
+         }
+          else{
+             sprintf(base_name,"%04d.jpg",index2);
+          }
+        
         left_img_file_name  = dir_second + "left/" + base_name;
         right_img_file_name = dir_second + "right/" + base_name; 
        // r.frame2 = index2;
@@ -705,7 +758,11 @@ bool my_libviso2_relative(Matrix &Tr_final, int index1, int index2, std::string 
 
             cout << ", Matches2: " << num_matches2;
             cout << ", Inliers2: " << inliers_percent2 << " %"<< endl;   
-            if(min(inliers_percent,inliers_percent2)>35)
+            double threshold=35;
+            if(dir2.empty()){
+              threshold=10;
+            }
+            if(min(inliers_percent,inliers_percent2)>=9)
             {
               pose = pose * Matrix::inv(viso.getMotion());
               std::cout<<"pose "<<pose<<std::endl;
